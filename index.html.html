@@ -197,6 +197,7 @@
         th:nth-child(8) { width: 95px; } /* Cochera Boleto */
         th:nth-child(9) { width: 85px; } /* Estado */
         th:nth-child(10) { width: 70px; } /* Link */
+        th:nth-child(11) { width: 90px; } /* Acciones */
         
         td:nth-child(4) {
             width: 152px;
@@ -443,6 +444,7 @@
                                 <th>Cochera Boleto</th>
                                 <th>Estado</th>
                                 <th>Link</th>
+                                <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody id="admin-tbody"></tbody>
@@ -573,7 +575,8 @@
                     <td><input class="editable-small" value="${row.cocheraActual}" onchange="updateField(${index}, 'cocheraActual', this.value)"></td>
                     <td><input class="editable-small" value="${row.cocheraBoleto}" onchange="updateField(${index}, 'cocheraBoleto', this.value)" ${confirmed ? 'readonly style="background: #e9ecef;"' : ''}></td>
                     <td>${confirmed ? '✅ Confirmado' : '⏳ Pendiente'}</td>
-                    <td><button class="btn btn-secondary" onclick="copyLink('${row.uf}')">📋</button></td>
+                    <td><button class="btn btn-secondary" onclick="copyLink('${row.uf}')" style="font-size: 11px; padding: 6px 10px;">📋</button></td>
+                    <td><button class="btn btn-danger" onclick="resetearPropietario(${index}, '${row.uf}')" style="font-size: 11px; padding: 6px 10px;">🔄</button></td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -606,6 +609,24 @@
             navigator.clipboard.writeText(link).then(() => {
                 alert(`✅ Link copiado para UF ${uf}`);
             });
+        }
+        
+        function resetearPropietario(index, uf) {
+            if (!confirm(`¿Estás seguro de resetear los datos del propietario UF ${uf}?\n\nEsto borrará:\n- Tel/Móvil\n- Email\n- Cochera Boleto\n- Estado de confirmación`)) {
+                return;
+            }
+            
+            const data = getData();
+            data[index].telefono = '';
+            data[index].email = '';
+            data[index].cocheraBoleto = '';
+            saveDataToStorage(data);
+            
+            // Borrar confirmación
+            localStorage.removeItem(`confirmed_${uf}`);
+            
+            alert(`✅ Datos del propietario UF ${uf} reseteados correctamente`);
+            loadAdminTable();
         }
         
         function loadPropietarioView() {
