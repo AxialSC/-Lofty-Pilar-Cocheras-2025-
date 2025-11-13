@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fideicomiso Lofty Pilar</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .mode-selector {
+            padding: 20px;
+            background: #f8f9fa;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .mode-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .mode-btn.admin {
+            background: #667eea;
+            color: white;
+        }
+        
+        .mode-btn.propietario {
+            background: #28a745;
+            color: white;
+        }
+        
+        .mode-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .content {
+            padding: 30px;
+            display: none;
+        }
+        
+        .content.active {
+            display: block;
+        }
+        
+        /* LOGIN ADMIN */
+        .login-box {
+            max-width: 400px;
+            margin: 50px auto;
+            background: #f8f9fa;
+            padding: 40px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .login-box h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .login-box input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        
+        .login-box button {
+            width: 100%;
+            padding: 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .login-box button:hover {
+            background: #5568d3;
+        }
+        
+        .error-msg {
+            color: #dc3545;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        
+        /* TABLA ADMIN */
+        .admin-controls {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            margin-top: 20px;
+        }
+        
+        thead {
+            background: #f8f9fa;
+            position: sticky;
+            top: 0;
+        }
+        
+        th {
+            padding: 12px 8px;
+            text-align: left;
+            font-weight: 600;
+            color: #495057;
+            border-bottom: 2px solid #dee2e6;
+        }
+        
+        /* Anchos de columnas específicos */
+        th:nth-child(1) { width: 50px; } /* UF */
+        th:nth-child(2) { width: 45px; } /* Piso */
+        th:nth-child(3) { width: 50px; } /* Depto */
+        th:nth-child(4) { width: 152px; min-width: 152px; } /* Propietario */
+        th:nth-child(5) { width: 110px; } /* Tel */
+        th:nth-child(6) { width: 152px; min-width: 152px; } /* Email */
+        th:nth-child(7) { width: 85px; } /* Cochera Actual */
+        th:nth-child(8) { width: 95px; } /* Cochera Boleto */
+        th:nth-child(9) { width: 85px; } /* Estado */
+        th:nth-child(10) { width: 70px; } /* Link */
+        
+        td:nth-child(4) {
+            width: 152px;
+            min-width: 152px;
+            word-wrap: break-word;
+            white-space: normal;
+        }
+        
+        td:nth-child(6) {
+            width: 152px;
+            min-width: 152px;
+            word-wrap: break-word;
+            white-space: normal;
+        }
+        
+        td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .editable {
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 4px;
+            border-radius: 4px;
+            width: 100%;
+            font-size: 11px;
+            box-sizing: border-box;
+        }
+        
+        .editable-small {
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 4px;
+            border-radius: 4px;
+            width: 50px;
+            text-align: center;
+            font-size: 12px;
+        }
+        
+        .uf-badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        /* VISTA PROPIETARIO */
+        .propietario-card {
+            max-width: 700px;
+            margin: 50px auto;
+            background: #f8f9fa;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .propietario-card h2 {
+            color: #667eea;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            background: white;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            align-items: center;
+        }
+        
+        .data-row label {
+            font-weight: 600;
+            color: #495057;
+            flex: 0 0 200px;
+        }
+        
+        .data-row span {
+            color: #333;
+            flex: 1;
+        }
+        
+        .data-row input {
+            flex: 1;
+            padding: 8px;
+            border: 2px solid #667eea;
+            border-radius: 6px;
+            font-size: 16px;
+            text-align: center;
+            width: 80px;
+        }
+        
+        .data-row.readonly {
+            background: #e9ecef;
+        }
+        
+        .data-row.editable-row {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+        }
+        
+        .confirm-section {
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        .confirm-btn {
+            padding: 15px 40px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .confirm-btn:hover {
+            background: #218838;
+            transform: scale(1.05);
+        }
+        
+        .confirm-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .success-msg {
+            color: #28a745;
+            font-weight: 600;
+            margin-top: 15px;
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .instruction-box {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        
+        .instruction-box strong {
+            color: #2196F3;
+        }
+        
+        @media (max-width: 768px) {
+            table {
+                font-size: 11px;
+            }
+            
+            th, td {
+                padding: 6px 3px;
+            }
+            
+            .propietario-card {
+                padding: 20px;
+            }
+            
+            .data-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .data-row label {
+                margin-bottom: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏢 Fideicomiso Lofty Pilar</h1>
+            <p>Sistema de Gestión de Propietarios</p>
+        </div>
+        
+        <div class="mode-selector">
+            <button class="mode-btn admin" onclick="showMode('admin')">👨‍💼 Panel Administrador</button>
+            <button class="mode-btn propietario" onclick="showMode('propietario')">👤 Vista Propietario</button>
+        </div>
+        
+        <!-- MODO ADMIN -->
+        <div id="admin-content" class="content">
+            <div id="admin-login" class="login-box">
+                <h2>🔐 Acceso Administrador</h2>
+                <input type="password" id="admin-password" placeholder="Contraseña" onkeypress="if(event.key==='Enter') loginAdmin()">
+                <button onclick="loginAdmin()">Ingresar</button>
+                <div id="login-error" class="error-msg"></div>
+            </div>
+            
+            <div id="admin-panel" style="display: none;">
+                <div class="admin-controls">
+                    <button class="btn btn-success" onclick="saveData()">💾 Guardar Cambios</button>
+                    <button class="btn btn-secondary" onclick="exportData()">📥 Exportar Datos</button>
+                    <button class="btn btn-danger" onclick="logout()">🚪 Cerrar Sesión</button>
+                </div>
+                
+                <div class="alert alert-info">
+                    <strong>ℹ️ Instrucciones:</strong> Puedes editar cualquier campo directamente en la tabla. 
+                    <strong>Cochera Actual:</strong> la que vos tenés asignada como administrador. 
+                    <strong>Cochera Boleto:</strong> la que completó el propietario según su boleto de compra.
+                </div>
+                
+                <div style="overflow-x: auto;">
+                    <table id="admin-table">
+                        <thead>
+                            <tr>
+                                <th>U.F.</th>
+                                <th>Piso</th>
+                                <th>Depto.</th>
+                                <th>Propietario</th>
+                                <th>Tel/Móvil</th>
+                                <th>Email</th>
+                                <th>Cochera Actual</th>
+                                <th>Cochera Boleto</th>
+                                <th>Estado</th>
+                                <th>Link</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- MODO PROPIETARIO -->
+        <div id="propietario-content" class="content">
+            <div class="propietario-card" id="propietario-card">
+                <h2>Mis Datos de Propietario</h2>
+                <div id="propietario-data"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const ADMIN_PASSWORD = 'Pilar@2025';
+        
+        const initialData = [
+            {uf: '01', piso: 'PB', depto: '1', propietario: 'TORRES, Vanesa', telefono: '', email: '', cocheraActual: '28', cocheraBoleto: ''},
+            {uf: '02', piso: 'PB', depto: '2', propietario: 'TORDINI, Victor R.', telefono: '', email: '', cocheraActual: '', cocheraBoleto: ''},
+            {uf: '03', piso: 'PB', depto: '3', propietario: 'MULLER, Pablo', telefono: '', email: '', cocheraActual: '', cocheraBoleto: ''},
+            {uf: '04', piso: 'PB', depto: '4', propietario: 'TORDINI, Maria L.', telefono: '', email: '', cocheraActual: '', cocheraBoleto: ''},
+            {uf: '05', piso: 'PB', depto: '5', propietario: 'CRUGNALE, Carlos', telefono: '', email: '', cocheraActual: '30', cocheraBoleto: ''},
+            {uf: '06', piso: '1°', depto: '1', propietario: 'TORDINI, Victor R.', telefono: '', email: '', cocheraActual: '34', cocheraBoleto: ''},
+            {uf: '07', piso: '1°', depto: '2', propietario: 'RAMASSA, Gabriela', telefono: '', email: '', cocheraActual: '14', cocheraBoleto: ''},
+            {uf: '08', piso: '1°', depto: '3', propietario: 'SALAS, Federico', telefono: '', email: '', cocheraActual: '35', cocheraBoleto: ''},
+            {uf: '09', piso: '1°', depto: '4', propietario: 'COLOMBO, Ignacio', telefono: '', email: '', cocheraActual: '', cocheraBoleto: ''},
+            {uf: '10', piso: '1°', depto: '5', propietario: 'CELSO, Mario', telefono: '', email: '', cocheraActual: '', cocheraBoleto: ''},
+            {uf: '11', piso: '1°', depto: '6', propietario: 'PEÑA VIERA, Alejandro', telefono: '', email: '', cocheraActual: '25', cocheraBoleto: ''},
+            {uf: '12', piso: '1°', depto: '7', propietario: 'GEIJO, Ernesto', telefono: '', email: '', cocheraActual: '31', cocheraBoleto: ''},
+            {uf: '13', piso: '1°', depto: '8', propietario: 'COSENTINO, Yamila', telefono: '', email: '', cocheraActual: '', cocheraBoleto: ''},
+            {uf: '14', piso: '1°', depto: '9', propietario: 'AGUIAR, Alvaro', telefono: '', email: '', cocheraActual: '21', cocheraBoleto: ''},
+            {uf: '15', piso: '1°', depto: '10', propietario: 'GOMEZ, Emiliano', telefono: '', email: '', cocheraActual: '8', cocheraBoleto: ''},
+            {uf: '16', piso: '2°', depto: '1', propietario: 'TORDINI, Victor R.', telefono: '', email: '', cocheraActual: '24', cocheraBoleto: ''},
+            {uf: '17', piso: '2°', depto: '2', propietario: 'EURO, Rade', telefono: '', email: '', cocheraActual: '1', cocheraBoleto: ''},
+            {uf: '18', piso: '2°', depto: '3', propietario: 'MULLER, Pablo', telefono: '', email: '', cocheraActual: '16', cocheraBoleto: ''},
+            {uf: '19', piso: '2°', depto: '4', propietario: 'POGLIANO, Gabriel', telefono: '', email: '', cocheraActual: '6', cocheraBoleto: ''},
+            {uf: '20', piso: '2°', depto: '5', propietario: 'GOMEZ, Emiliano', telefono: '', email: '', cocheraActual: '7', cocheraBoleto: ''},
+            {uf: '21', piso: '2°', depto: '6', propietario: 'DEL VILLAR, Juan Carlos', telefono: '', email: '', cocheraActual: '27', cocheraBoleto: ''},
+            {uf: '22', piso: '2°', depto: '7', propietario: 'EURO, Rade', telefono: '', email: '', cocheraActual: '26', cocheraBoleto: ''},
+            {uf: '23', piso: '2°', depto: '8', propietario: 'OCHOA, Federico', telefono: '', email: '', cocheraActual: '22', cocheraBoleto: ''},
+            {uf: '24', piso: '2°', depto: '9', propietario: 'SAMAD, Alfredo', telefono: '', email: '', cocheraActual: '12', cocheraBoleto: ''},
+            {uf: '25', piso: '2°', depto: '10', propietario: 'RADE, Sergio', telefono: '', email: '', cocheraActual: '13', cocheraBoleto: ''},
+            {uf: '26', piso: '3°', depto: '1', propietario: 'TORDINI, Maria L.', telefono: '', email: '', cocheraActual: '29', cocheraBoleto: ''},
+            {uf: '27', piso: '3°', depto: '2', propietario: 'MORALES, Carolina', telefono: '', email: '', cocheraActual: '', cocheraBoleto: ''},
+            {uf: '28', piso: '3°', depto: '3', propietario: 'ARDALLA, Gustavo', telefono: '', email: '', cocheraActual: '20', cocheraBoleto: ''},
+            {uf: '29', piso: '3°', depto: '4', propietario: 'MULLER, Pablo', telefono: '', email: '', cocheraActual: '15', cocheraBoleto: ''},
+            {uf: '30', piso: '3°', depto: '5', propietario: 'VECINO, Romina', telefono: '', email: '', cocheraActual: '10', cocheraBoleto: ''},
+            {uf: '31', piso: '3°', depto: '6', propietario: 'ROCCO, Agostina', telefono: '', email: '', cocheraActual: '9', cocheraBoleto: ''},
+            {uf: '32', piso: '3°', depto: '7', propietario: 'DE LAS HERAS, Joaquín', telefono: '', email: '', cocheraActual: '32', cocheraBoleto: ''},
+            {uf: '33', piso: '3°', depto: '8', propietario: 'GURGOVICH, Ana', telefono: '', email: '', cocheraActual: '23', cocheraBoleto: ''},
+            {uf: '34', piso: '3°', depto: '9', propietario: 'EURO, Rade', telefono: '', email: '', cocheraActual: '13', cocheraBoleto: ''},
+            {uf: '35', piso: '3°', depto: '10', propietario: 'MARTIN, Santiago', telefono: '', email: '', cocheraActual: '4', cocheraBoleto: ''},
+            {uf: '36', piso: '4°', depto: '1', propietario: 'LUCERO, Fernando', telefono: '', email: '', cocheraActual: '', cocheraBoleto: ''},
+            {uf: '37', piso: '4°', depto: '2', propietario: 'ROBLES, Horacio', telefono: '', email: '', cocheraActual: '2', cocheraBoleto: ''},
+            {uf: '38', piso: '4°', depto: '3', propietario: 'TORDINI, Victor R.', telefono: '', email: '', cocheraActual: '3', cocheraBoleto: ''},
+            {uf: '39', piso: '4°', depto: '4', propietario: 'DIORIO, Victoria', telefono: '', email: '', cocheraActual: '', cocheraBoleto: ''},
+            {uf: '40', piso: '4°', depto: '5', propietario: 'PEÑATE, Victoria', telefono: '', email: '', cocheraActual: '19', cocheraBoleto: ''},
+            {uf: '41', piso: '4°', depto: '6', propietario: 'SORBARA, Adrian', telefono: '', email: '', cocheraActual: '18', cocheraBoleto: ''},
+            {uf: '42', piso: '4°', depto: '7', propietario: 'TORDINI, Victor R.', telefono: '', email: '', cocheraActual: '11', cocheraBoleto: ''},
+            {uf: '43', piso: '4°', depto: '8', propietario: 'MUÑOZ, Adrian', telefono: '', email: '', cocheraActual: '5', cocheraBoleto: ''},
+            {uf: '76', piso: '-', depto: '-', propietario: 'DESARROLLADORA', telefono: '', email: '', cocheraActual: '33', cocheraBoleto: ''}
+        ];
+        
+        // Inicializar datos si no existen
+        if (!localStorage.getItem('loftyData')) {
+            localStorage.setItem('loftyData', JSON.stringify(initialData));
+        }
+        
+        function getData() {
+            return JSON.parse(localStorage.getItem('loftyData') || '[]');
+        }
+        
+        function saveDataToStorage(data) {
+            localStorage.setItem('loftyData', JSON.stringify(data));
+        }
+        
+        function showMode(mode) {
+            document.getElementById('admin-content').classList.remove('active');
+            document.getElementById('propietario-content').classList.remove('active');
+            
+            if (mode === 'admin') {
+                document.getElementById('admin-content').classList.add('active');
+            } else {
+                document.getElementById('propietario-content').classList.add('active');
+                loadPropietarioView();
+            }
+        }
+        
+        function loginAdmin() {
+            const password = document.getElementById('admin-password').value;
+            const errorDiv = document.getElementById('login-error');
+            
+            if (password === ADMIN_PASSWORD) {
+                document.getElementById('admin-login').style.display = 'none';
+                document.getElementById('admin-panel').style.display = 'block';
+                loadAdminTable();
+            } else {
+                errorDiv.textContent = '❌ Contraseña incorrecta';
+            }
+        }
+        
+        function logout() {
+            document.getElementById('admin-login').style.display = 'block';
+            document.getElementById('admin-panel').style.display = 'none';
+            document.getElementById('admin-password').value = '';
+            document.getElementById('login-error').textContent = '';
+        }
+        
+        function loadAdminTable() {
+            const data = getData();
+            const tbody = document.getElementById('admin-tbody');
+            tbody.innerHTML = '';
+            
+            data.forEach((row, index) => {
+                const confirmed = localStorage.getItem(`confirmed_${row.uf}`) === 'true';
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><span class="uf-badge">${row.uf}</span></td>
+                    <td><input class="editable-small" value="${row.piso}" onchange="updateField(${index}, 'piso', this.value)"></td>
+                    <td><input class="editable-small" value="${row.depto}" onchange="updateField(${index}, 'depto', this.value)"></td>
+                    <td><input class="editable" value="${row.propietario}" onchange="updateField(${index}, 'propietario', this.value)"></td>
+                    <td><input class="editable" value="${row.telefono}" onchange="updateField(${index}, 'telefono', this.value)"></td>
+                    <td><input class="editable" value="${row.email}" onchange="updateField(${index}, 'email', this.value)"></td>
+                    <td><input class="editable-small" value="${row.cocheraActual}" onchange="updateField(${index}, 'cocheraActual', this.value)"></td>
+                    <td><input class="editable-small" value="${row.cocheraBoleto}" onchange="updateField(${index}, 'cocheraBoleto', this.value)" ${confirmed ? 'readonly style="background: #e9ecef;"' : ''}></td>
+                    <td>${confirmed ? '✅ Confirmado' : '⏳ Pendiente'}</td>
+                    <td><button class="btn btn-secondary" onclick="copyLink('${row.uf}')">📋</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+        
+        function updateField(index, field, value) {
+            const data = getData();
+            data[index][field] = value;
+            saveDataToStorage(data);
+        }
+        
+        function saveData() {
+            alert('✅ Datos guardados correctamente');
+            loadAdminTable();
+        }
+        
+        function exportData() {
+            const data = getData();
+            const json = JSON.stringify(data, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'lofty_pilar_data.json';
+            a.click();
+        }
+        
+        function copyLink(uf) {
+            const link = `${window.location.origin}${window.location.pathname}?uf=${uf}`;
+            navigator.clipboard.writeText(link).then(() => {
+                alert(`✅ Link copiado para UF ${uf}`);
+            });
+        }
+        
+        function loadPropietarioView() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const uf = urlParams.get('uf');
+            const card = document.getElementById('propietario-card');
+            const dataDiv = document.getElementById('propietario-data');
+            
+            if (!uf) {
+                dataDiv.innerHTML = `
+                    <div class="alert alert-warning">
+                        <strong>⚠️ Acceso Directo</strong><br>
+                        Por favor, utilice el link único que recibió por email o WhatsApp.
+                    </div>
+                `;
+                return;
+            }
+            
+            const data = getData();
+            const propietario = data.find(p => p.uf === uf);
+            
+            if (!propietario) {
+                dataDiv.innerHTML = `
+                    <div class="alert alert-warning">
+                        <strong>❌ No encontrado</strong><br>
+                        No se encontró información para la UF ${uf}.
+                    </div>
+                `;
+                return;
+            }
+            
+            const confirmed = localStorage.getItem(`confirmed_${uf}`) === 'true';
+            
+            dataDiv.innerHTML = `
+                <div class="instruction-box">
+                    <strong>📝 Instrucciones:</strong><br>
+                    Por favor, complete los siguientes datos:<br>
+                    • <strong>Tel/Móvil:</strong> Su número de contacto<br>
+                    • <strong>Email:</strong> Su correo electrónico<br>
+                    • <strong>Cochera Boleto:</strong> El número de cochera según figura en su BOLETO de compra<br>
+                    La "Cochera Actual" ya está cargada por administración.
+                </div>
+                
+                <div class="data-row readonly">
+                    <label>🏢 Unidad Funcional:</label>
+                    <span>${propietario.uf}</span>
+                </div>
+                <div class="data-row readonly">
+                    <label>📍 Piso:</label>
+                    <span>${propietario.piso}</span>
+                </div>
+                <div class="data-row readonly">
+                    <label>🚪 Departamento:</label>
+                    <span>${propietario.depto}</span>
+                </div>
+                <div class="data-row readonly">
+                    <label>👤 Propietario:</label>
+                    <span>${propietario.propietario}</span>
+                </div>
+                <div class="data-row readonly">
+                    <label>🏢 Cochera Actual:</label>
+                    <span>${propietario.cocheraActual || 'Sin cochera'}</span>
+                </div>
+                <div class="data-row editable-row">
+                    <label>📱 Tel/Móvil:</label>
+                    ${confirmed ? 
+                        `<span>${propietario.telefono || '-'}</span>` :
+                        `<input type="text" id="telefono" value="${propietario.telefono}" placeholder="Ingrese teléfono">`
+                    }
+                </div>
+                <div class="data-row editable-row">
+                    <label>📧 Email:</label>
+                    ${confirmed ? 
+                        `<span>${propietario.email || '-'}</span>` :
+                        `<input type="email" id="email" value="${propietario.email}" placeholder="Ingrese email" style="width: 100%;">`
+                    }
+                </div>
+                <div class="data-row editable-row">
+                    <label>📄 Cochera Boleto:</label>
+                    ${confirmed ? 
+                        `<span>${propietario.cocheraBoleto || 'Sin cochera'}</span>` :
+                        `<input type="number" id="cocheraBoleto" value="${propietario.cocheraBoleto}" placeholder="Ingrese N°" min="1" max="99">`
+                    }
+                </div>
+                
+                <div class="confirm-section">
+                    ${confirmed ? 
+                        '<div class="success-msg">✅ Ya confirmaste tus datos anteriormente</div>' :
+                        `<button class="confirm-btn" onclick="confirmarDatos('${uf}')">
+                            ✅ Confirmar mis datos
+                        </button>
+                        <div id="confirm-msg"></div>`
+                    }
+                </div>
+            `;
+        }
+        
+        function confirmarDatos(uf) {
+            const telefonoInput = document.getElementById('telefono');
+            const emailInput = document.getElementById('email');
+            const cocheraBoletoInput = document.getElementById('cocheraBoleto');
+            
+            const telefonoValue = telefonoInput ? telefonoInput.value : '';
+            const emailValue = emailInput ? emailInput.value : '';
+            const cocheraBoletoValue = cocheraBoletoInput ? cocheraBoletoInput.value : '';
+            
+            // Actualizar los valores en los datos
+            const data = getData();
+            const propietario = data.find(p => p.uf === uf);
+            if (propietario) {
+                propietario.telefono = telefonoValue;
+                propietario.email = emailValue;
+                propietario.cocheraBoleto = cocheraBoletoValue;
+                saveDataToStorage(data);
+            }
+            
+            localStorage.setItem(`confirmed_${uf}`, 'true');
+            const msgDiv = document.getElementById('confirm-msg');
+            msgDiv.innerHTML = '<div class="success-msg">✅ ¡Gracias! Tus datos han sido confirmados correctamente.</div>';
+            
+            setTimeout(() => {
+                loadPropietarioView();
+            }, 2000);
+        }
+        
+        // Inicializar vista según URL
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('uf')) {
+                showMode('propietario');
+            } else {
+                showMode('admin');
+            }
+        };
+    </script>
+</body>
+</html>
